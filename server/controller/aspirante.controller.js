@@ -77,17 +77,42 @@ const getAspirante = async (req, res) => {
 }
 
 const getAspiranteAll = async (req, res) => {
+    const { fecha, turno, aula, dni } = req.body;
+
     try {
-        const aspirantes = await Aspirante.findAll({
-            order: [
-                ['apellido', 'ASC']
-            ]
+        let query = `
+            SELECT asp.*, exa.*
+            FROM aspirante AS asp
+            INNER JOIN examen AS exa ON exa.id_examen = asp.examen_id
+            WHERE 1=1
+        `;
+
+        if (fecha) {
+            query += ` AND exa.fecha = :fecha`;
+        }
+        if (turno) {
+            query += ` AND exa.turno = :turno`;
+        }
+        if (aula) {
+            query += ` AND asp.presencia = 1`;
+        } else {
+            query += ` AND (asp.presencia = 1 OR asp.presencia = 0)`;
+        }
+        if (dni) {
+            query += ' AND asp.dni = :dni'
+        }
+
+        query += ' ORDER BY asp.apellido ASC';
+
+        const aspirantes = await sequelize.query(query, {
+            replacements: { fecha, turno, aula, dni },
+            type: sequelize.QueryTypes.SELECT, 
         });
-        res.status(200).json(aspirantes);
+
+        res.status(200).json({ aspirantes, corte });
     } catch (error) {
-        res.status(500).json({
-            message: error.message
-        });
+        console.error(error);
+        res.status(500).json({ error: "Error al obtener los datos." });
     }
 }
 
