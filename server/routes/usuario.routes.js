@@ -3,9 +3,9 @@ import { createUsuario, updateUsuario, login, logout} from '../controller/usuari
 import verifyToken from '../middleware/jwt.js';
 
 const router = express.Router();
-router.post('/usuario', createUsuario);
+router.post('/usuario', verifyToken, createUsuario);
 router.put('/update/:id_usuario', verifyToken, updateUsuario);
 router.post('/login', login);
-router.post('/logout', logout)
+router.post('/logout', verifyToken, logout)
 
 export default router;

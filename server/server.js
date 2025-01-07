@@ -4,8 +4,11 @@ import sequelize from './config/db.js';
 import routes from './routes/index.routes.js';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import dotenv from 'dotenv'
+import https from 'https'
 
 const app = express();
+dotenv.config();
 const PORT = process.env.PORT || 3006;
 
 const allowedOrigins = ['https://srv555183.hstgr.cloud', 'http://localhost:5173'];
@@ -30,61 +33,43 @@ app.use(express.json());
 app.use(morgan('dev'));
 app.use('/api', routes);
 
-// sequelize.authenticate()
-//     .then(() => {
-//         console.log('Connection has been established successfully.');
-//         return sequelize.sync({ alter: true });
-//     })
-//     .then(() => {
-//         let server;
-//         let io;
-
-//         if (process.env.NODE_ENV === 'production') {
-//             const options = {
-//                 key: fs.readFileSync('/etc/letsencrypt/live/srv555183.hstgr.cloud/privkey.pem'),
-//                 cert: fs.readFileSync('/etc/letsencrypt/live/srv555183.hstgr.cloud/fullchain.pem')
-//             };
-//             server = https.createServer(options, app);
-//             io = new Server(server, {
-//                 cors: {
-//                     origin: allowedOrigins,
-//                     methods: ['GET', 'POST', 'PUT', 'DELETE', 'UPDATE', 'PATCH'],
-//                     credentials: true,
-//                 },
-//             });
-//         } else {
-//             server = http.createServer(app);
-//             io = new Server(server, {
-//                 cors: {
-//                     origin: allowedOrigins,
-//                     methods: ['GET', 'POST', 'PUT', 'DELETE', 'UPDATE', 'PATCH'],
-//                     credentials: true,
-//                 },
-//             });
-//         }
-
-//         socketConfiguration(io)
-
-//         server.listen(PORT, () => {
-//             console.log(`Server on port ${PORT}`);
-//         })
-//     })
-//     .catch((error) => {
-//         console.error('Unable to connect to the database:', error);
-//     });
-
 sequelize.authenticate()
     .then(() => {
         console.log('Connection has been established successfully.');
         return sequelize.sync({});
     })
     .then(() => {
-        app.listen(PORT, () => {
-            console.log(`Server on port ${PORT}`);
-        });
+        if (process.env.NODE_ENV === 'production') {
+            const options = {
+                key: fs.readFileSync('/etc/letsencrypt/live/srv555183.hstgr.cloud/privkey.pem'),
+                cert: fs.readFileSync('/etc/letsencrypt/live/srv555183.hstgr.cloud/fullchain.pem')
+            };
+
+            https.createServer(options,app).listen(PORT,  () => {
+                console.log(`Server on port ${PORT}`);
+            });
+        } else {
+            app.listen(PORT, () => {
+                console.log(`Server on port ${PORT}`);
+            });
+        }
     })
     .catch((error) => {
         console.error('Unable to connect to the database:', error);
     });
+
+// sequelize.authenticate()
+//     .then(() => {
+//         console.log('Connection has been established successfully.');
+//         return sequelize.sync({});
+//     })
+//     .then(() => {
+//         app.listen(PORT, () => {
+//             console.log(`Server on port ${PORT}`);
+//         });
+//     })
+//     .catch((error) => {
+//         console.error('Unable to connect to the database:', error);
+//     });
 
 
