@@ -46,6 +46,8 @@ sequelize.authenticate()
                 cert: fs.readFileSync('/etc/letsencrypt/live/srv555183.hstgr.cloud/fullchain.pem')
             };
 
+            console.log(options)
+
             https.createServer(options,app).listen(PORT,  () => {
                 console.log(`Server on port ${PORT}`);
             });
