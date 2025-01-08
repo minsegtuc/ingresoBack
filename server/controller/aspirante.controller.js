@@ -95,6 +95,7 @@ const getAspiranteAll = async (req, res) => {
         }
         if (aula) {
             query += ` AND asp.presencia = 1`;
+            query += ` AND exa.aula = :aula`;
         } else {
             query += ` AND (asp.presencia = 1 OR asp.presencia = 0)`;
         }
