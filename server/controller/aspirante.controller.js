@@ -77,8 +77,8 @@ const getAspirante = async (req, res) => {
 }
 
 const getAspiranteAll = async (req, res) => {
-    const { fecha, turno, aula, dni } = req.body;
-
+    const { fecha, turno, aula, busqueda, genero, condicion } = req.body;
+    console.log("Condicion: " , condicion)
     try {
         let query = `
             SELECT asp.*, exa.*
@@ -87,27 +87,47 @@ const getAspiranteAll = async (req, res) => {
             WHERE 1=1
         `;
 
+        const replacements = {}
+
         if (fecha) {
             query += ` AND exa.fecha = :fecha`;
+            replacements.fecha = fecha
         }
         if (turno) {
             query += ` AND exa.turno = :turno`;
+            replacements.turno = turno
         }
-        if (aula) {
-            query += ` AND asp.presencia = 1`;
-            query += ` AND exa.aula = :aula`;
+        if (condicion) {
+            if (condicion === "1") {
+                query += ` AND asp.presencia = 1`;
+            }else{
+                query += ` AND asp.presencia = 0`;
+            }
         } else {
             query += ` AND (asp.presencia = 1 OR asp.presencia = 0)`;
         }
-        if (dni) {
-            query += ' AND asp.dni = :dni'
+        if (aula) {
+            query += ` AND exa.aula = :aula`;
+            replacements.aula = aula
+        }
+        if (busqueda) {
+            query += ` AND (
+                asp.dni LIKE :busqueda OR 
+                asp.apellido LIKE :busqueda OR 
+                asp.nombre LIKE :busqueda
+            )`
+            replacements.busqueda = `%${busqueda}%`
+        }
+        if (genero) {
+            query += ' AND asp.genero = :genero'
+            replacements.genero = genero
         }
 
         query += ' ORDER BY asp.apellido ASC';
 
         const aspirantes = await sequelize.query(query, {
-            replacements: { fecha, turno, aula, dni },
-            type: sequelize.QueryTypes.SELECT, 
+            replacements,
+            type: sequelize.QueryTypes.SELECT,
         });
 
         res.status(200).json({ aspirantes, corte });
@@ -117,8 +137,9 @@ const getAspiranteAll = async (req, res) => {
     }
 }
 
+//PARA ESTADISTICAS
 const getAprobados = async (req, res) => {
-    const { fecha, turno, aula } = req.body;
+    const { fecha, turno, aula, genero } = req.body;
 
     try {
         let query = `
@@ -137,10 +158,13 @@ const getAprobados = async (req, res) => {
         if (aula) {
             query += ` AND exa.aula = :aula`;
         }
+        if (genero) {
+            query += ' AND asp.genero = :genero'
+        }
 
         const aspirantes = await sequelize.query(query, {
-            replacements: { fecha, turno, aula },
-            type: sequelize.QueryTypes.SELECT, 
+            replacements: { fecha, turno, aula, genero },
+            type: sequelize.QueryTypes.SELECT,
         });
 
         res.status(200).json({ aspirantes, corte });
