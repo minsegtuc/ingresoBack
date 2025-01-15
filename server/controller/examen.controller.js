@@ -21,6 +21,7 @@ const createExamen = async (req, res) => {
 }
 
 const updateExamen = async (req, res) => {
+    console.log(req.body)
     try {
         await Examen.update({
             fecha: req.body.fecha,
@@ -52,8 +53,26 @@ const getEstado = async (req, res) => {
     } catch (error) {
         res.status(500).json({
             message: error.message
-        });        
+        });
     }
 };
 
-export { createExamen, updateExamen, getEstado };
+const getExamen = async (req, res) => {
+    try {
+        const examen = await Examen.findOne({
+            where: {
+                fecha: req.body.fecha,
+                turno: req.body.turno,
+                aula: req.body.aula,
+            }
+        });
+        res.status(200).json(examen);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+};
+
+
+export { createExamen, updateExamen, getEstado, getExamen };
