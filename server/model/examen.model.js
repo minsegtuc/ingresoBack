@@ -22,7 +22,7 @@ const Examen = sequelize.define('examen', {
     },
     cantidad_inscriptos: {
         type: DataTypes.INTEGER
-    },
+    },    
 }, {
     tableName: 'examen',
     timestamps: false

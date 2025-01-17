@@ -2,6 +2,7 @@ import Log from "./log.model.js";
 import Aspirante from "./aspirante.model.js";
 import Examen from "./examen.model.js";
 import Usuario from "./usuario.model.js";
+import Pregunta from "./pregunta.model.js";
 
 Usuario.hasMany(Log, {
     foreignKey: 'usuario_id',
@@ -18,6 +19,16 @@ Examen.hasMany(Aspirante, {
 });
 
 Aspirante.belongsTo(Examen, {
+    foreignKey: 'examen_id', 
+    targetKey: 'id_examen'   
+});
+
+Examen.hasMany(Pregunta, {
+    foreignKey: 'examen_id', 
+    sourceKey: 'id_examen'   
+});
+
+Pregunta.belongsTo(Examen, {
     foreignKey: 'examen_id', 
     targetKey: 'id_examen'   
 });
