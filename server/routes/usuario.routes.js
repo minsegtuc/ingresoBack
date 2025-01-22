@@ -3,7 +3,7 @@ import { createUsuario, updateUsuario, login, logout} from '../controller/usuari
 import verifyToken from '../middleware/jwt.js';
 
 const router = express.Router();
-router.post('/usuario', verifyToken, createUsuario);
+router.post('/usuario', createUsuario);
 router.put('/update/:id_usuario', verifyToken, updateUsuario);
 router.post('/login', login);
 router.post('/logout', verifyToken, logout)

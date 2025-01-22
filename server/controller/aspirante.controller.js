@@ -16,8 +16,6 @@ const createAspirante = async (req, res) => {
             nombre: req.body.nombre,
             apellido: req.body.apellido,
             genero: req.body.genero,
-            nota: req.body.nota,
-            examen_id: req.body.examen_id
         });
         res.status(200).json("aspirante creado");
     } catch (error) {
@@ -35,8 +33,6 @@ const updateAspirante = async (req, res) => {
             apellido: req.body.apellido,
             genero: req.body.genero,
             presencia: req.body.presencia,
-            nota: req.body.nota,
-            examen_id: req.body.examen_id
         }, {
             where: {
                 dni: req.params.dni
@@ -53,6 +49,7 @@ const updateAspirante = async (req, res) => {
     }
 }
 
+//SE PUEDE USAR EN EL NUEVO CONTROLADOR DEL NUEVO MODELO
 const getAspirante = async (req, res) => {
     console.log("Params: ", req.params.dni);
     try {
@@ -76,103 +73,4 @@ const getAspirante = async (req, res) => {
     }
 }
 
-const getAspiranteAll = async (req, res) => {
-    const { fecha, turno, aula, busqueda, genero, condicion } = req.body;
-    console.log("Condicion: " , condicion)
-    try {
-        let query = `
-            SELECT asp.*, exa.*
-            FROM aspirante AS asp
-            INNER JOIN examen AS exa ON exa.id_examen = asp.examen_id
-            WHERE 1=1
-        `;
-
-        const replacements = {}
-
-        if (fecha) {
-            query += ` AND exa.fecha = :fecha`;
-            replacements.fecha = fecha
-        }
-        if (turno) {
-            query += ` AND exa.turno = :turno`;
-            replacements.turno = turno
-        }
-        if (condicion) {
-            if (condicion === "1") {
-                query += ` AND asp.presencia = 1`;
-            }else{
-                query += ` AND asp.presencia = 0`;
-            }
-        } else {
-            query += ` AND (asp.presencia = 1 OR asp.presencia = 0)`;
-        }
-        if (aula) {
-            query += ` AND exa.aula = :aula`;
-            replacements.aula = aula
-        }
-        if (busqueda) {
-            query += ` AND (
-                asp.dni LIKE :busqueda OR 
-                asp.apellido LIKE :busqueda OR 
-                asp.nombre LIKE :busqueda
-            )`
-            replacements.busqueda = `%${busqueda}%`
-        }
-        if (genero) {
-            query += ' AND asp.genero = :genero'
-            replacements.genero = genero
-        }
-
-        query += ' ORDER BY asp.apellido ASC';
-
-        const aspirantes = await sequelize.query(query, {
-            replacements,
-            type: sequelize.QueryTypes.SELECT,
-        });
-
-        res.status(200).json({ aspirantes, corte });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Error al obtener los datos." });
-    }
-}
-
-//PARA ESTADISTICAS
-const getAprobados = async (req, res) => {
-    const { fecha, turno, aula, genero } = req.body;
-
-    try {
-        let query = `
-            SELECT asp.*, exa.*
-            FROM aspirante AS asp
-            INNER JOIN examen AS exa ON exa.id_examen = asp.examen_id
-            WHERE asp.presencia = 1
-        `;
-
-        if (fecha) {
-            query += ` AND exa.fecha = :fecha`;
-        }
-        if (turno) {
-            query += ` AND exa.turno = :turno`;
-        }
-        if (aula) {
-            query += ` AND exa.aula = :aula`;
-        }
-        if (genero) {
-            query += ' AND asp.genero = :genero'
-        }
-
-        const aspirantes = await sequelize.query(query, {
-            replacements: { fecha, turno, aula, genero },
-            type: sequelize.QueryTypes.SELECT,
-        });
-
-        res.status(200).json({ aspirantes, corte });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Error al obtener los datos." });
-    }
-};
-
-
-export { createAspirante, updateAspirante, getAspirante, getAspiranteAll, getAprobados };
+export { createAspirante, updateAspirante, getAspirante };

@@ -15,21 +15,6 @@ const Aspirante = sequelize.define('aspirante', {
     },
     genero: {
         type: DataTypes.STRING
-    },
-    presencia: {
-        type: DataTypes.TINYINT,
-        defaultValue: 0
-    },
-    nota: {
-        type: DataTypes.INTEGER,
-        nullable: true
-    },
-    examen_id: {
-        type: DataTypes.INTEGER,
-        references: {
-            model: 'examen',
-            key: 'id_examen'
-        }
     }
 }, {
     tableName: 'aspirante',
