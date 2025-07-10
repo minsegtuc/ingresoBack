@@ -11,6 +11,7 @@ const router = express.Router();
 router.use('/aspirantes', verifyToken, AspiranteRutas);
 router.use('/examenes', verifyToken, ExamenRutas);
 router.use('/examenAspirantes', verifyToken, ExamenAspiranteRutas);
+router.use('/examenNotas', ExamenAspiranteRutas);
 router.use('/usuarios', UsuarioRutas);
 router.use('/preguntas', verifyToken, PreguntaRutas)
 router.get('/verifyToken', verifyToken, VerifyToken);
