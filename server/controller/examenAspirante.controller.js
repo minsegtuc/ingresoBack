@@ -127,7 +127,7 @@ const getAprobados = async (req, res) => {
 
 const getAspiranteAll = async (req, res) => {
     const { fecha, turno, aula, busqueda, genero, condicion } = req.body;
-    console.log("Condicion: ", condicion)
+    //console.log("Condicion: ", condicion)
     try {
         let query = `
             SELECT asp.*, exa.*, ea.*
@@ -179,6 +179,8 @@ const getAspiranteAll = async (req, res) => {
             replacements,
             type: sequelize.QueryTypes.SELECT,
         });
+
+        await registrarLog('get', 'Aspirantes obtenidos', req.userId ? req.userId : "911");
 
         res.status(200).json({ aspirantes, corte });
     } catch (error) {
