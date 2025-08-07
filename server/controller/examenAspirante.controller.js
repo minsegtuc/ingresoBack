@@ -81,10 +81,8 @@ const updateExamenAspirante = async (req, res) => {
     }
 };
 
-
-
 const getAprobados = async (req, res) => {
-    const { fecha, turno, aula, genero } = req.body;
+    const { fechaDesde, fechaHasta, turno, aula, genero } = req.body;
 
     try {
         let query = `
@@ -96,9 +94,13 @@ const getAprobados = async (req, res) => {
         `;
 
         const replacements = {};
-        if (fecha) {
-            query += ` AND exa.fecha = :fecha`;
-            replacements.fecha = fecha;
+        if (fechaDesde) {
+            query += ` AND exa.fecha >= :fechaDesde`;
+            replacements.fechaDesde = fechaDesde;
+        }
+        if (fechaHasta) {
+            query += ` AND exa.fecha <= :fechaHasta`;
+            replacements.fechaHasta = fechaHasta;
         }
         if (turno) {
             query += ` AND exa.turno = :turno`;
@@ -189,6 +191,74 @@ const getAspiranteAll = async (req, res) => {
     }
 }
 
+const getAspiranteAllFiltros = async (req, res) => {
+    const { fechaDesde, fechaHasta, turno, aula, busqueda, genero, condicion } = req.body;
+    //console.log("Condicion: ", condicion)
+    try {
+        let query = `
+            SELECT asp.*, exa.*, ea.*
+            FROM examen_aspirante AS ea
+            INNER JOIN examen AS exa ON exa.id_examen = ea.examen_id
+            INNER JOIN aspirante AS asp ON asp.dni = ea.aspirante_dni
+            WHERE 1=1
+        `;
+
+        const replacements = {}
+
+        if (fechaDesde) {
+            query += ` AND exa.fecha >= :fechaDesde`;
+            replacements.fechaDesde = fechaDesde
+        }
+        if (fechaHasta) {
+            query += ` AND exa.fecha <= :fechaHasta`;
+            replacements.fechaHasta = fechaHasta
+        }
+        if (turno) {
+            query += ` AND exa.turno = :turno`;
+            replacements.turno = turno
+        }
+        if (condicion) {
+            if (condicion === "1") {
+                query += ` AND ea.presencia = 1`;
+            } else {
+                query += ` AND ea.presencia = 0`;
+            }
+        } else {
+            query += ` AND (ea.presencia = 1 OR ea.presencia = 0)`;
+        }
+        if (aula) {
+            query += ` AND exa.aula = :aula`;
+            replacements.aula = aula
+        }
+        if (busqueda) {
+            query += ` AND (
+                asp.dni LIKE :busqueda OR 
+                asp.apellido LIKE :busqueda OR 
+                asp.nombre LIKE :busqueda
+            )`
+            replacements.busqueda = `%${busqueda}%`
+        }
+        if (genero) {
+            query += ' AND asp.genero = :genero'
+            replacements.genero = genero
+        }
+
+        query += ' ORDER BY asp.apellido ASC';
+
+        const aspirantes = await sequelize.query(query, {
+            replacements,
+            type: sequelize.QueryTypes.SELECT,
+        });
+
+        await registrarLog('get', 'Aspirantes obtenidos', req.userId ? req.userId : "911");
+
+        res.status(200).json({ aspirantes, corte });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Error al obtener los datos." });
+    }
+}
+
 const getAspirante = async (req, res) => {
     console.log("Params: ", req.params.dni);
     try {
@@ -211,4 +281,4 @@ const getAspirante = async (req, res) => {
     }
 }
 
-export { createExamenAspirante, updateExamenAspirante, getAprobados, getAspiranteAll, getAspirante };
+export { createExamenAspirante, updateExamenAspirante, getAprobados, getAspiranteAll, getAspirante, getAspiranteAllFiltros };
