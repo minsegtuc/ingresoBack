@@ -20,6 +20,10 @@ const Examen = sequelize.define('examen', {
         type: DataTypes.TINYINT,
         defaultValue: 0
     },
+    referencia: {
+        type: DataTypes.STRING,
+        nullable: true
+    },
     cantidad_inscriptos: {
         type: DataTypes.INTEGER
     },    

@@ -8,6 +8,7 @@ const createExamen = async (req, res) => {
             turno: req.body.turno,
             aula: req.body.aula,
             estado: req.body.estado,
+            referencia: req.body.referencia,
             cantidad_inscriptos: req.body.cantidad_inscriptos
         });
 
@@ -28,6 +29,7 @@ const updateExamen = async (req, res) => {
             turno: req.body.turno,
             aula: req.body.aula,
             estado: req.body.estado,
+            referencia: req.body.referencia,
             cantidad_inscriptos: req.body.cantidad_inscriptos
         }, {
             where: {
