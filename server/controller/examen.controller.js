@@ -2,18 +2,33 @@ import Examen from "../model/examen.model.js";
 import { registrarLog } from '../helpers/logHelpers.js';
 
 const createExamen = async (req, res) => {
+
     try {
-        await Examen.create({
-            fecha: req.body.fecha,
-            turno: req.body.turno,
-            aula: req.body.aula,
-            estado: req.body.estado,
-            referencia: req.body.referencia,
-            cantidad_inscriptos: req.body.cantidad_inscriptos
+        const examen = await Examen.findOne({
+            where: {
+                fecha: req.body.fecha,
+                turno: req.body.turno,
+                aula: req.body.aula,
+            }
         });
 
-        await registrarLog('create', 'Examen creado', req.userId);
-        res.status(200).json("examen creado");
+        if (examen) {
+            return res.status(400).json({
+                message: "Ya existe un examen con la misma fecha, turno y aula."
+            });
+        } else {
+            await Examen.create({
+                fecha: req.body.fecha,
+                turno: req.body.turno,
+                aula: req.body.aula,
+                estado: req.body.estado,
+                referencia: req.body.referencia,
+                cantidad_inscriptos: req.body.cantidad_inscriptos
+            });
+
+            await registrarLog('create', 'Examen creado', req.userId);
+            res.status(200).json("examen creado");
+        }
     } catch (error) {
         res.status(500).json({
             message: error.message
