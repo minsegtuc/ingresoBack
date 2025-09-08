@@ -5,7 +5,7 @@ const verifyToken = (req, res, next) => {
 
     dotenv.config()
 
-    const token = req.cookies.auth_token
+    const token = req.cookies.token
     if(!token){
         return res.status(403).json({message: 'A token is required for authentication'})
     }
@@ -14,7 +14,7 @@ const verifyToken = (req, res, next) => {
         if(err){
             return res.status(401).json({message: 'Invalid Token'})
         }
-        req.userId = decoded.id_usuario
+        req.user = decoded
         next()
     })
 }
