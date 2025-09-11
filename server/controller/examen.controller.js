@@ -26,7 +26,7 @@ const createExamen = async (req, res) => {
                 cantidad_inscriptos: req.body.cantidad_inscriptos
             });
 
-            await registrarLog('create', 'Examen creado', req.userId);
+            await registrarLog('create', 'Examen creado', req.user?.id);
             res.status(200).json("examen creado");
         }
     } catch (error) {
@@ -52,7 +52,7 @@ const updateExamen = async (req, res) => {
             }
         });
 
-        await registrarLog('update', 'Examen actualizado', req.userId);
+        await registrarLog('update', 'Examen actualizado', req.user?.id);
 
         res.status(200).json("examen actualizado");
     }

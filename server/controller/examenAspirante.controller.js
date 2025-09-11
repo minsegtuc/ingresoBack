@@ -14,7 +14,7 @@ const createExamenAspirante = async (req, res) => {
             aspirante_dni: req.body.aspirante_dni
         });
 
-        await registrarLog('create', 'Examen Aspirante creado', req.userId);
+        await registrarLog('create', 'Examen Aspirante creado', req.user?.id);
         res.status(200).json("examen aspirante creado");
     } catch (error) {
         res.status(500).json({
@@ -36,7 +36,7 @@ const createExamenAspirante = async (req, res) => {
 //             }
 //         });
 
-//         await registrarLog('update', 'Examen Aspirante actualizado', req.userId);
+//         await registrarLog('update', 'Examen Aspirante actualizado', req.user?.id);
 
 //         res.status(200).json("examen aspirante actualizado");
 //     }
@@ -69,7 +69,7 @@ const updateExamenAspirante = async (req, res) => {
         }
 
         // Registrar log solo si se afectó alguna fila
-        await registrarLog('update', 'Examen Aspirante actualizado', req.userId);
+        await registrarLog('update', 'Examen Aspirante actualizado', req.user?.id);
 
         // Respuesta exitosa
         res.status(200).json("Examen aspirante actualizado");
@@ -182,7 +182,7 @@ const getAspiranteAll = async (req, res) => {
             type: sequelize.QueryTypes.SELECT,
         });
 
-        await registrarLog('get', 'Aspirantes obtenidos', req.userId ? req.userId : "911");
+        await registrarLog('get', 'Aspirantes obtenidos', req.user?.id ? req.user?.id : "911");
 
         res.status(200).json({ aspirantes, corte });
     } catch (error) {
@@ -250,7 +250,7 @@ const getAspiranteAllFiltros = async (req, res) => {
             type: sequelize.QueryTypes.SELECT,
         });
 
-        await registrarLog('get', 'Aspirantes obtenidos', req.userId ? req.userId : "911");
+        await registrarLog('get', 'Aspirantes obtenidos', req.user?.id ? req.user?.id : "911");
 
         res.status(200).json({ aspirantes, corte });
     } catch (error) {

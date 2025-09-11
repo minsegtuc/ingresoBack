@@ -39,7 +39,7 @@ const updateAspirante = async (req, res) => {
             }
         });
 
-        await registrarLog('update', 'Aspirante actualizado', req.userId);
+        await registrarLog('update', 'Aspirante actualizado', req.user?.id);
 
         res.status(200).json("aspirante actualizado");
     } catch (error) {
