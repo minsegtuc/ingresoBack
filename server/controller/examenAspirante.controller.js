@@ -1,4 +1,5 @@
 import ExamenAspirante from '../model/examenAspirante.model.js';
+import Aspirante from '../model/aspirante.model.js';
 import { registrarLog } from '../helpers/logHelpers.js';
 import dotenv from 'dotenv'
 import { Op, fn, col, literal } from "sequelize";
@@ -75,6 +76,39 @@ const updateExamenAspirante = async (req, res) => {
         res.status(200).json("Examen aspirante actualizado");
     } catch (error) {
         console.error("Error en updateExamenAspirante:", error.message);
+        res.status(500).json({
+            message: error.message
+        });
+    }
+};
+
+const updateAspirante = async (req, res) => {
+    console.log("Ingreso a aspirante: " + req.body.nombre, req.body.apellido, req.body.genero, req.body.dni);
+    try {
+        const [affectedRows] = await Aspirante.update({
+            nombre: req.body.nombre,
+            apellido: req.body.apellido,
+            genero: req.body.genero
+        }, {
+            where: {
+                dni: req.body.dni
+            }
+        });
+
+        if (affectedRows === 0) {
+            // Si no se afectaron filas, devolver un error 404 (no encontrado).
+            return res.status(404).json({
+                message: "No se encontró un registro con los datos proporcionados. No se realizó ningún cambio."
+            });
+        }
+
+        // Registrar log solo si se afectó alguna fila
+        await registrarLog('update', 'Aspirante actualizado', req.user?.id);
+
+        // Respuesta exitosa
+        res.status(200).json("Aspirante actualizado");
+    } catch (error) {
+        console.error("Error en update Aspirante:", error.message);
         res.status(500).json({
             message: error.message
         });
@@ -281,4 +315,4 @@ const getAspirante = async (req, res) => {
     }
 }
 
-export { createExamenAspirante, updateExamenAspirante, getAprobados, getAspiranteAll, getAspirante, getAspiranteAllFiltros };
+export { createExamenAspirante, updateExamenAspirante, getAprobados, getAspiranteAll, getAspirante, getAspiranteAllFiltros, updateAspirante };
