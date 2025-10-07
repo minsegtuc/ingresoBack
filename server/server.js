@@ -41,14 +41,7 @@ sequelize.authenticate()
     })
     .then(() => {
         if (process.env.NODE_ENV === 'production') {
-            const options = {
-                key: fs.readFileSync('/etc/letsencrypt/live/srv555183.hstgr.cloud/privkey.pem'),
-                cert: fs.readFileSync('/etc/letsencrypt/live/srv555183.hstgr.cloud/fullchain.pem')
-            };
-
-            console.log(options)
-
-            https.createServer(options,app).listen(PORT,  () => {
+            app.listen(PORT, () => {
                 console.log(`Server on port ${PORT}`);
             });
         } else {
